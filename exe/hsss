@@ -5,9 +5,9 @@ opt={}
 
 arg=OptionParser.new do |opts|
   opts.on("--struct [#{Hsss::DEFAULT_STRUCT_NAME}]", "C struct name"){|v| opt[:struct_name]= v}
-  opts.on("--scripts [#{Hsss::DEFAULT_SCRIPTS_NAME}]", "Scripts variable"){|v| opt[:scripts_name]=v}
-  opts.on("--hashes [#{Hsss::DEFAULT_HASHES_NAME}]", "Hashes variable"){|v| opt[:hashes_name]=v}
-  opts.on("--names [#{Hsss::DEFAULT_NAMES_NAME}]", "Script names variable"){|v| opt[:names_name]=v}
+  opts.on("--scripts [#{Hsss::DEFAULT_SCRIPTS_NAME}]", "Scripts variable"){|v| opt[:scripts_struct]=v}
+  opts.on("--hashes [#{Hsss::DEFAULT_HASHES_NAME}]", "Hashes variable"){|v| opt[:hashes_struct]=v}
+  opts.on("--names [#{Hsss::DEFAULT_NAMES_NAME}]", "Script names variable"){|v| opt[:names_struct]=v}
   opts.on("--no-parse", "Skip using luac to check script syntax"){opt[:no_luac]=true}
   opts.on("--prefix PREFIX", "Prefix default names with this"){|v| opt[:prefix]=v}
 end
@@ -20,5 +20,7 @@ EOS
 rest = arg.parse!
 
 hsss = Hsss::Hsss.new(rest, opt)
+
+exit 1 if hsss.failed?
 
 puts hsss.to_s
