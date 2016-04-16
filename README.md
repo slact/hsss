@@ -90,7 +90,7 @@ for((script_src)=(char **)&redis_lua_scripts, (script_hash)=(char **)&redis_lua_
   } script_hash_and_name_t;
   
   //error checking callback
-  static void redis_load_script_callback(redisAsyncContext *c, void *r, void *privdata) {
+  static void redisLoadScriptCallback(redisAsyncContext *c, void *r, void *privdata) {
     script_hash_and_name_t *hn = privdata;
     redisReply *reply = r;
     switch(reply->type) {
@@ -113,7 +113,7 @@ for((script_src)=(char **)&redis_lua_scripts, (script_hash)=(char **)&redis_lua_
       script_hash_and_name_t *hn = alloc(sizeof(*hn));
       hn->name=*script_name;
       hn->hash=*script_hash;
-      redisAsyncCommand(c, &redis_load_script_callback, hn, "SCRIPT LOAD %s", *script);
+      redisAsyncCommand(c, redisLoadScriptCallback, hn, "SCRIPT LOAD %s", *script);
     }
   }
   ```
