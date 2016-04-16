@@ -6,18 +6,20 @@ module Hsss
   DEFAULT_HASHES_NAME="redis_lua_hashes"
   DEFAULT_NAMES_NAME="redis_lua_script_names"
   DEFAULT_SCRIPTS_NAME="redis_lua_scripts"
+  DEFAULT_COUNT_NAME="redis_lua_scripts_count"
   
   class Hsss
     EXT="lua"
     
-    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct
+    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name
     def initialize(files, opt={})
       @scripts={}
       
       { struct_name: DEFAULT_STRUCT_NAME, 
         hashes_struct: DEFAULT_HASHES_NAME,
         names_struct: DEFAULT_NAMES_NAME,
-        scripts_struct: DEFAULT_SCRIPTS_NAME }.each do |var, default|
+        scripts_struct: DEFAULT_SCRIPTS_NAME,
+        count_name: DEFAULT_COUNT_NAME}.each do |var, default|
         send "#{var}=", opt[var] || default
       end
       
@@ -26,6 +28,7 @@ module Hsss
           send "#{var}=", "#{opt[:prefix]}#{send var}"
         end
       end
+      @include_count = !opt[:skip_count]
       
       (Array === files ? files : [ files ]).each do |f|
         begin
@@ -50,8 +53,6 @@ module Hsss
         %s
         };
         
-        #define REDIS_LUA_HASH_LENGTH %i
-        
         static #{struct_name} #{names_struct} = {
         %s
         };
@@ -59,6 +60,7 @@ module Hsss
         static #{struct_name} #{scripts_struct} = {
         %s
         };
+        
       EOS
       
       @struct=[]
@@ -105,10 +107,12 @@ module Hsss
     
     def to_s
       if @scripts.count > 0
-        out=sprintf @cout, @struct.join("\n"), @hashed_table.join(",\n"), Digest::SHA1.hexdigest("foo").length, @name_table.join("\n"), @script_table.join(",\n\n")
+        out=sprintf @cout, @struct.join("\n"), @hashed_table.join(",\n"),  @name_table.join("\n"), @script_table.join(",\n\n")
       else
         out="//nothing here\n"
       end
+      
+      out<< "const int #{@count_name}=#{@scripts.count};\n" if @include_count
       out
     end
     
