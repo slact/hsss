@@ -7,11 +7,12 @@ module Hsss
   DEFAULT_NAMES_NAME="redis_lua_script_names"
   DEFAULT_SCRIPTS_NAME="redis_lua_scripts"
   DEFAULT_COUNT_NAME="redis_lua_scripts_count"
+  DEFAULT_ITER_MACRO_NAME="REDIS_LUA_SCRIPTS_EACH"
   
   class Hsss
     EXT="lua"
     
-    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name
+    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name, :iter_macro_name
     def initialize(files, opt={})
       @scripts={}
       
@@ -19,7 +20,8 @@ module Hsss
         hashes_struct: DEFAULT_HASHES_NAME,
         names_struct: DEFAULT_NAMES_NAME,
         scripts_struct: DEFAULT_SCRIPTS_NAME,
-        count_name: DEFAULT_COUNT_NAME}.each do |var, default|
+        count_name: DEFAULT_COUNT_NAME,
+        iter_macro_name: DEFAULT_ITER_MACRO_NAME}.each do |var, default|
         send "#{var}=", opt[var] || default
       end
       
@@ -29,6 +31,7 @@ module Hsss
         end
       end
       @include_count = !opt[:skip_count]
+      @include_iter_macro = !opt[:skip_each]
       
       (Array === files ? files : [ files ]).each do |f|
         begin
@@ -114,7 +117,15 @@ module Hsss
         out="//nothing here\n"
       end
       
-      out<< "const int #{@count_name}=#{@scripts.count};\n" if @include_count
+      out << "const int #{@count_name}=#{@scripts.count};\n" if @include_count
+      
+      if @include_iter_macro
+        macro = []
+        macro << "#define #{iter_macro_name}(script_src, script_name, script_hash) \\"
+        macro << "for((script_src)=(char **)&#{scripts_struct}, (script_hash)=(char **)&#{hashes_struct}, (script_name)=(char **)&#{names_struct}; (script_src) < (char **)(&#{scripts_struct} + 1); (script_src)++, (script_hash)++, (script_name)++) "
+        out << macro.join("\n")
+      end
+      
       out
     end
     

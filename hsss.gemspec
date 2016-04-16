@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Leo P."]
   spec.email         = ["junk@slact.net"]
 
-  spec.summary       = %q{Hash-Safe Script Splinter}
-  spec.description   = %q{Transforms Lua files into structs of C-strings and associated headers. Great for embedding Redis Lua scripts.}
+  spec.summary       = %q{Hash-Safe Script Splinterer}
+  spec.description   = %q{Hash-Safe Script Splinterer: Transforms Lua files into structs of C-strings and associated headers. Great for embedding Redis Lua scripts.}
   spec.homepage      = "https://github.com/slact/hsss"
   spec.license       = "MIT"
 

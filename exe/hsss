@@ -10,6 +10,8 @@ arg=OptionParser.new do |opts|
   opts.on("--names [#{Hsss::DEFAULT_NAMES_NAME}]", "Script names variable"){|v| opt[:names_struct]=v}
   opts.on("--count [#{Hsss::DEFAULT_COUNT_NAME}]", "integer script count variable"){|v| opt[:count_name]=v}
   opts.on("--no-count", "Omit script count variable"){opt[:skip_count]=true}
+  opts.on("--each-macro [#{Hsss::DEFAULT_ITER_MACRO_NAME}]", "Iterator macro"){|v| opt[:iter_macro_name]=v}
+  opts.on("--no-each", "Omit the iterator macro"){opt[:skip_each]=true}
   opts.on("--no-parse", "Skip using luac to check script syntax"){opt[:no_luac]=true}
   opts.on("--prefix PREFIX", "Prefix default names with this"){|v| opt[:prefix]=v}
 end
@@ -18,6 +20,7 @@ Hash-Safe Script Splinterer, a Lua Script and hash embedder into C source.
 Good for putting Redis Lua scripts in your C headers.
 Usage: hsss [options] files
 EOS
+arg.version=Hsss::VERSION
 
 rest = arg.parse!
 
