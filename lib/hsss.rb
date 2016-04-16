@@ -91,7 +91,9 @@ module Hsss
     end
     
     def check_script(path)
-      system "luac -p #{path}"
+      ret = system "luac -p #{path}"
+      @failed = true unless ret
+      ret
     end
     
     def cquote(str)
