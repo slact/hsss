@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+require 'hsss'
+require "optparse"
+opt={}
+
+arg=OptionParser.new do |opts|
+  opts.on("--struct [#{Hsss::DEFAULT_STRUCT_NAME}]", "C struct name"){|v| opt[:struct_name]= v}
+  opts.on("--scripts [#{Hsss::DEFAULT_SCRIPTS_NAME}]", "Scripts variable"){|v| opt[:scripts_name]=v}
+  opts.on("--hashes [#{Hsss::DEFAULT_HASHES_NAME}]", "Hashes variable"){|v| opt[:hashes_name]=v}
+  opts.on("--names [#{Hsss::DEFAULT_NAMES_NAME}]", "Script names variable"){|v| opt[:names_name]=v}
+  opts.on("--no-parse", "Skip using luac to check script syntax"){opt[:no_luac]=true}
+  opts.on("--prefix PREFIX", "Prefix default names with this"){|v| opt[:prefix]=v}
+end
+arg.banner=<<EOS
+Hash-Safe Script Splinterer, a Lua Script and hash embedder into C source. 
+Good for putting Redis Lua scripts in your C headers.
+Usage: hsss [options] files
+EOS
+
+rest = arg.parse!
+
+hsss = Hsss::Hsss.new(rest, opt)
+
+puts hsss.to_s
