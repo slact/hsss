@@ -9,12 +9,15 @@ arg=OptionParser.new do |opts|
   opts.on("--row-struct [#{Hsss::DEFAULT_ROW_STRUCT_NAME}]", "Hash+name+script struct for 'whole' format."){|v| opt[:row_struct_name]= v}
   opts.on("--scripts [#{Hsss::DEFAULT_SCRIPTS_NAME}]", "Scripts variable (split or whole format)"){|v| opt[:scripts_struct]=v}
   opts.on("--hashes [#{Hsss::DEFAULT_HASHES_NAME}]", "Hashes variable (split format)"){|v| opt[:hashes_struct]=v}
+  opts.on("--no-hashes", "Omit hashes variable (split format)"){opt[:hashes_struct]=false}
   opts.on("--names [#{Hsss::DEFAULT_NAMES_NAME}]", "Script names variable (split format)"){|v| opt[:names_struct]=v}
+  opts.on("--no-names", "Omit script names variable (split format)"){opt[:names_struct]=false}
   opts.on("--count [#{Hsss::DEFAULT_COUNT_NAME}]", "integer script count variable"){|v| opt[:count_name]=v}
   opts.on("--no-count", "Omit script count variable"){opt[:skip_count]=true}
   opts.on("--each-macro [#{Hsss::DEFAULT_ITER_MACRO_NAME}]", "Iterator macro"){|v| opt[:iter_macro_name]=v}
   opts.on("--no-each", "Omit the iterator macro"){opt[:skip_each]=true}
   opts.on("--no-parse", "Skip using luac to check script syntax"){opt[:no_luac]=true}
+  opts.on("--no-static", "Don't make variables static (file-scoped)"){opt[:no_static]=true}
   opts.on("--prefix PREFIX", "Prefix default names with this"){|v| opt[:prefix]=v}
 end
 arg.banner=<<EOS
@@ -27,9 +30,9 @@ arg.version=Hsss::VERSION
 rest = arg.parse!
 
 case opt[:format]
-when nil, "split"
+when "split"
   hsss = Hsss::CSplit.new(rest, opt)
-when "whole"
+when "whole", nil
   hsss = Hsss::CWhole.new(rest, opt)
 else
   STDERR.puts "Invalid format #{opt[:format]}."
