@@ -3,7 +3,7 @@
 Hash-Safe Script Splinterer, a Lua Script and hash embedder into C source. 
 Good for putting Redis Lua scripts in your C headers.
 ```
-Usage: hsss [options] files
+Usage: hsss [options] files > output_file.h
         --format [split|whole]       Output as separate or a single struct
         --struct [redis_lua_scripts_t]
                                      C struct name
@@ -199,7 +199,18 @@ for((script_src)=(char **)&redis_lua_scripts, (script_hash)=(char **)&redis_lua_
     }
   }
   ```
-  
+
+## Using in your build tooling
+
+```Makefile
+
+lua_scripts.h: scripts/*.lua
+	hsss scripts/*.lua > lua_scripts.h
+
+main_build_rule: lua_scripts.h
+
+```
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
