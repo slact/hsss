@@ -59,7 +59,6 @@ module Hsss
         
         str=[]
         for l in script.lines do
-          l.gsub!("\\", '\\\\\\') #escape backslashes
           cmt=l.match /^--(.*)/
           break unless cmt
           str << "  //#{cmt[1]}"
@@ -82,6 +81,7 @@ module Hsss
     def cquote(str, line_start="")
       out=[]
       str.each_line do |l|
+        l.gsub!("\\", '\\\\\\') #escape backslashes
         l.sub! "\n", "\\n"
         l.gsub! '"', '\"'
         l.gsub! /^(.*)$/, "#{line_start}\"\\1\""
