@@ -59,7 +59,7 @@ module Hsss
         
         str=[]
         for l in script.lines do
-          l.gsub("\\", "\\\\") #escape backslashes
+          l.gsub!("\\", '\\\\\\') #escape backslashes
           cmt=l.match /^--(.*)/
           break unless cmt
           str << "  //#{cmt[1]}"
