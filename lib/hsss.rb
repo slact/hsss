@@ -80,6 +80,9 @@ module Hsss
     
     def cquote(str, line_start="")
       out=[]
+      if str.length == 0
+        return "#{line_start}\"\"" #empty string
+      end
       str.each_line do |l|
         l.gsub!("\\", '\\\\\\') #escape backslashes
         l.sub! "\n", "\\n"
