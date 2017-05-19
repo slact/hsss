@@ -18,7 +18,7 @@ arg=OptionParser.new do |opts|
   opts.on("--no-each", "Omit the iterator macro"){opt[:skip_each]=true}
   opts.on("--no-parse", "Skip using luac to check script syntax"){opt[:no_luac]=true}
   opts.on("--no-static", "Don't make variables static (file-scoped)"){opt[:no_static]=true}
-  opts.on("--prefix PREFIX", "Prefix default names with this"){|v| opt[:prefix]=v}
+  opts.on("--prefix [#{Hsss::DEFAULT_PREFIX}]", "Prefix default names with this"){|v| opt[:prefix]=v}
 end
 arg.banner=<<EOS
 Hash-Safe Script Splinterer, a Lua Script and hash embedder into C source. 

@@ -2,35 +2,44 @@ require "hsss/version"
 require 'digest/sha1'
 
 module Hsss
-  DEFAULT_STRUCT_NAME="redis_lua_scripts_t"
-  DEFAULT_ROW_STRUCT_NAME="redis_lua_script_t"
-  DEFAULT_HASHES_NAME="redis_lua_hashes"
-  DEFAULT_NAMES_NAME="redis_lua_script_names"
-  DEFAULT_SCRIPTS_NAME="redis_lua_scripts"
-  DEFAULT_COUNT_NAME="redis_lua_scripts_count"
-  DEFAULT_ITER_MACRO_NAME="REDIS_LUA_SCRIPTS_EACH"
+  DEFAULT_STRUCT_NAME="lua_scripts_t"
+  DEFAULT_ROW_STRUCT_NAME="lua_script_t"
+  DEFAULT_HASHES_NAME="lua_hashes"
+  DEFAULT_NAMES_NAME="lua_script_names"
+  DEFAULT_SCRIPTS_NAME="lua_scripts"
+  DEFAULT_COUNT_NAME="lua_scripts_count"
+  DEFAULT_ITER_MACRO_NAME="LUA_SCRIPTS_EACH"
+  DEFAULT_PREFIX="redis_"
   
   class COutput
     EXT="lua"
     attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name, :iter_macro_name, :row_struct_name
     
+    def cased_prefix(prefix, name)
+      if name && prefix
+        if name.upcase == name and name.downcase != name
+          name = "#{prefix.upcase}#{name}"
+        else
+          name = "#{prefix}#{name}"
+        end
+      end
+      name
+    end
+    
     def initialize(files, opt={})
       @scripts={}
-      { struct_name: DEFAULT_STRUCT_NAME, 
+      names = { struct_name: DEFAULT_STRUCT_NAME, 
         row_struct_name: DEFAULT_ROW_STRUCT_NAME,
         hashes_struct: DEFAULT_HASHES_NAME,
         names_struct: DEFAULT_NAMES_NAME,
         scripts_struct: DEFAULT_SCRIPTS_NAME,
         count_name: DEFAULT_COUNT_NAME,
-        iter_macro_name: DEFAULT_ITER_MACRO_NAME}.each do |var, default|
-        send "#{var}=", opt[var]!=false ? opt[var] || default : false
+        iter_macro_name: DEFAULT_ITER_MACRO_NAME}
+      
+      names.each do |var, default|
+        send "#{var}=", opt[var]!=false ? opt[var] || cased_prefix(opt[:prefix], default) : false
       end
       
-      if opt[:prefix]
-        [:struct_name, :hashes_struct, :names_struct, :scripts_struct].each do |var|
-          send "#{var}=", "#{opt[:prefix]}#{send var}" if send(var)
-        end
-      end
       @include_count = !opt[:skip_count]
       @include_iter_macro = !opt[:skip_each]
       @include_hash = !!hashes_struct
