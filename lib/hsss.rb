@@ -33,6 +33,7 @@ module Hsss
       end
       @include_count = !opt[:skip_count]
       @include_iter_macro = !opt[:skip_each]
+      @include_hash = !!hashes_struct
       
       (Array === files ? files : [ files ]).each do |f|
         begin
@@ -68,7 +69,7 @@ module Hsss
         
         @script_table << script_string(name, script)
         
-        @hashed_table << Digest::SHA1.hexdigest(script)
+        @hashed_table << Digest::SHA1.hexdigest(script) if @include_hash
       end
     end
     
@@ -165,8 +166,7 @@ module Hsss
         // https://github.com/slact/hsss
         
         typedef struct {
-          char *name;
-          char *hash;
+          char *name;#{@include_hash ? "\n          char *hash;" : ""}
           char *script;
         } #{row_struct_name};
         
@@ -192,7 +192,7 @@ module Hsss
       if @scripts.count > 0
         scrapts=[]
         for i in 0...@scripts.count do
-          scrapts<< "  {\"#{@name_table[i]}\", \"#{@hashed_table[i]}\",\n#{@script_table[i]}}"
+          scrapts<< "  {\"#{@name_table[i]}\", #{@include_hash ? "\"#{@hashed_table[i]}\"," : ""}\n#{@script_table[i]}}"
         end
         out=sprintf @cout, @struct.join("\n"), scrapts.join(",\n\n")
       else
