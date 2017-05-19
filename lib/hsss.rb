@@ -16,11 +16,11 @@ module Hsss
     attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name, :iter_macro_name, :row_struct_name
     
     def cased_prefix(prefix, name)
-      if name && prefix
+      if name
         if name.upcase == name and name.downcase != name
-          name = "#{prefix.upcase}#{name}"
+          name = "#{(prefix || DEFAULT_PREFIX).upcase}#{name}"
         else
-          name = "#{prefix}#{name}"
+          name = "#{(prefix || DEFAULT_PREFIX)}#{name}"
         end
       end
       name
