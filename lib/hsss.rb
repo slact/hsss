@@ -1,6 +1,6 @@
 require "hsss/version"
 require 'digest/sha1'
-require "pry"
+
 module Hsss
   DEFAULT_STRUCT_NAME="redis_lua_scripts_t"
   DEFAULT_ROW_STRUCT_NAME="redis_lua_script_t"
