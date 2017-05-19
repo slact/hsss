@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
     [:development, "bundler"],
     [:development, "rake"],
     [:development, "pry"],
-    [:development, "pry-debundle"]
   ]
 
   dependencies.each do |type, name, version|
