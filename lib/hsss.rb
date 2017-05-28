@@ -228,6 +228,7 @@ module Hsss
       end
       if @header_only
         out << sprintf(@headf, @struct.join("\n"))
+        out << "#{@static}#{struct_name} #{scripts_struct};\n"
         out << "const int #{@count_name};\n" if @include_count
         out << iter_macro
       elsif @data_only 
