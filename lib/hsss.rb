@@ -44,7 +44,8 @@ module Hsss
       @data_only = opt[:data_only]
       @include_count = !opt[:skip_count]
       @include_iter_macro = !opt[:skip_each]
-      @header_guard = opt[:header_guard]
+      @header_guard = opt[:header_guard] || "LUA_SCRIPTS_H"
+      @header_guard = false if @header_guard.length == 0
       @include_hash = !!hashes_struct
       
       (Array === files ? files : [ files ]).each do |f|
@@ -233,11 +234,11 @@ module Hsss
           out << "#define #{@header_guard}\n"
         end
         out << sprintf(@headf, @struct.join("\n"))
-        out << "#{@static}#{struct_name} #{scripts_struct};\n"
-        out << "const int #{@count_name};\n" if @include_count
+        out << "extern #{@static}#{struct_name} #{scripts_struct};\n"
+        out << "extern const int #{@count_name};\n" if @include_count
         out << iter_macro
         if @header_guard
-          out << "#endif //#{@header_guard}\n"
+          out << "\n#endif //#{@header_guard}\n"
         end
       elsif @data_only 
         out << "#{@static}#{struct_name} #{scripts_struct} = {\n"
