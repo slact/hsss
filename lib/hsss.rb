@@ -44,6 +44,7 @@ module Hsss
       @data_only = opt[:data_only]
       @include_count = !opt[:skip_count]
       @include_iter_macro = !opt[:skip_each]
+      @header_guard = opt[:header_guard]
       @include_hash = !!hashes_struct
       
       (Array === files ? files : [ files ]).each do |f|
@@ -227,10 +228,17 @@ module Hsss
         scripties = nil
       end
       if @header_only
+        if @header_guard
+          out << "#ifndef #{@header_guard}\n"
+          out << "#define #{@header_guard}\n"
+        end
         out << sprintf(@headf, @struct.join("\n"))
         out << "#{@static}#{struct_name} #{scripts_struct};\n"
         out << "const int #{@count_name};\n" if @include_count
         out << iter_macro
+        if @header_guard
+          out << "#endif //#{@header_guard}\n"
+        end
       elsif @data_only 
         out << "#{@static}#{struct_name} #{scripts_struct} = {\n"
         out << "#{scrapts.join(",\n\n")}\n"

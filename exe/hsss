@@ -19,6 +19,7 @@ arg=OptionParser.new do |opts|
   opts.on("--no-parse", "Skip using luac to check script syntax"){opt[:no_luac]=true}
   opts.on("--no-static", "Don't make variables static (file-scoped)"){opt[:no_static]=true}
   opts.on("--header-only", "just the header"){opt[:header_only]=true}
+  opts.on("--header-guard", "header guard string"){|v|opt[:header_guard]=v}
   opts.on("--data-only", "just the data"){opt[:data_only]=true}
   opts.on("--prefix [#{Hsss::DEFAULT_PREFIX}]", "Prefix default names with this"){|v| opt[:prefix]=v}
 end
