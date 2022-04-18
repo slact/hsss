@@ -8,12 +8,13 @@ module Hsss
   DEFAULT_NAMES_NAME="lua_script_names"
   DEFAULT_SCRIPTS_NAME="lua_scripts"
   DEFAULT_COUNT_NAME="lua_scripts_count"
+  DEFAULT_COUNT_MACRO_NAME="LUA_SCRIPTS_COUNT"
   DEFAULT_ITER_MACRO_NAME="LUA_SCRIPTS_EACH"
   DEFAULT_PREFIX="redis_"
   
   class COutput
     EXT="lua"
-    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name, :iter_macro_name, :row_struct_name
+    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name, :count_macro_name, :iter_macro_name, :row_struct_name
     
     def cased_prefix(prefix, name)
       if name
@@ -34,6 +35,7 @@ module Hsss
         names_struct: DEFAULT_NAMES_NAME,
         scripts_struct: DEFAULT_SCRIPTS_NAME,
         count_name: DEFAULT_COUNT_NAME,
+        count_macro_name: DEFAULT_COUNT_MACRO_NAME,
         iter_macro_name: DEFAULT_ITER_MACRO_NAME}
       
       names.each do |var, default|
@@ -43,6 +45,7 @@ module Hsss
       @header_only = opt[:header_only]
       @data_only = opt[:data_only]
       @include_count = !opt[:skip_count]
+      @include_count_macro = !opt[:skip_count_macro]
       @include_iter_macro = !opt[:skip_each]
       @header_guard = opt[:header_guard] || "LUA_SCRIPTS_H"
       @header_guard = false if @header_guard.length == 0
@@ -83,6 +86,14 @@ module Hsss
         @script_table << script_string(name, script)
         
         @hashed_table << Digest::SHA1.hexdigest(script) if @include_hash
+      end
+    end
+    
+    def count_macro
+      if @include_count_macro
+        macro = "#define #{count_macro_name} #{@scripts.count}\n"
+      else
+        ""
       end
     end
     
@@ -161,6 +172,7 @@ module Hsss
           out << "//no scrpts\n"
         end
         out << "const int #{@count_name}=#{@scripts.count};\n" if @include_count
+        out << count_macro
         out << iter_macro
       end
       
@@ -248,6 +260,7 @@ module Hsss
       else
         out << sprintf(@cout, (@struct || []).join("\n"), (scrapts || []).join(",\n\n"))
         out << "const int #{@count_name}=#{@scripts.count};\n" if @include_count
+        out << count_macro
         out << iter_macro
       end
       out
