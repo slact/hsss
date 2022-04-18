@@ -248,6 +248,7 @@ module Hsss
         out << sprintf(@headf, @struct.join("\n"))
         out << "extern #{@static}#{struct_name} #{scripts_struct};\n"
         out << "extern const int #{@count_name};\n" if @include_count
+        out << count_macro
         out << iter_macro
         if @header_guard
           out << "\n#endif //#{@header_guard}\n"
