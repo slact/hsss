@@ -10,11 +10,12 @@ module Hsss
   DEFAULT_COUNT_NAME="lua_scripts_count"
   DEFAULT_COUNT_MACRO_NAME="LUA_SCRIPTS_COUNT"
   DEFAULT_ITER_MACRO_NAME="LUA_SCRIPTS_EACH"
+  DEFAULT_ALL_HASHES_STRING_NAME="LUA_SCRIPTS_ALL_HASHES"
   DEFAULT_PREFIX="redis_"
   
   class COutput
     EXT="lua"
-    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name, :count_macro_name, :iter_macro_name, :row_struct_name
+    attr_accessor :struct_name, :hashes_struct, :names_struct, :scripts_struct, :count_name, :count_macro_name, :all_hashes_string_name, :iter_macro_name, :row_struct_name
     
     def cased_prefix(prefix, name)
       if name
@@ -36,7 +37,9 @@ module Hsss
         scripts_struct: DEFAULT_SCRIPTS_NAME,
         count_name: DEFAULT_COUNT_NAME,
         count_macro_name: DEFAULT_COUNT_MACRO_NAME,
-        iter_macro_name: DEFAULT_ITER_MACRO_NAME}
+        iter_macro_name: DEFAULT_ITER_MACRO_NAME,
+        all_hashes_string_name: DEFAULT_ALL_HASHES_STRING_NAME,
+              }
       
       names.each do |var, default|
         send "#{var}=", opt[var]!=false ? opt[var] || cased_prefix(opt[:prefix], default) : false
@@ -47,6 +50,7 @@ module Hsss
       @include_count = !opt[:skip_count]
       @include_count_macro = !opt[:skip_count_macro]
       @include_iter_macro = !opt[:skip_each]
+      @include_all_hashes_macro = !opt[:skip_all_hashes_string]
       @header_guard = opt[:header_guard] || "LUA_SCRIPTS_H"
       @header_guard = false if @header_guard.length == 0
       @include_hash = !!hashes_struct
@@ -90,13 +94,15 @@ module Hsss
     end
     
     def count_macro
-      if @include_count_macro
-        macro = "#define #{count_macro_name} #{@scripts.count}\n"
-      else
-        ""
-      end
+      return "" unless @include_count_macro
+      "#define #{count_macro_name} #{@scripts.count}\n"
     end
     
+    def all_hashes_string_macro
+      return "" unless @include_all_hashes_macro
+      "#define #{all_hashes_string_name} \"#{@hashed_table.join " "}\"\n"
+    end
+      
     def check_script(path)
       ret = system "luac -p #{path}"
       @failed = true unless ret
@@ -172,6 +178,7 @@ module Hsss
           out << "//no scrpts\n"
         end
         out << "const int #{@count_name}=#{@scripts.count};\n" if @include_count
+        out << all_hashes_string_macro
         out << count_macro
         out << iter_macro
       end
@@ -248,6 +255,7 @@ module Hsss
         out << sprintf(@headf, @struct.join("\n"))
         out << "extern #{@static}#{struct_name} #{scripts_struct};\n"
         out << "extern const int #{@count_name};\n" if @include_count
+        out << all_hashes_string_macro
         out << count_macro
         out << iter_macro
         if @header_guard
@@ -261,6 +269,7 @@ module Hsss
       else
         out << sprintf(@cout, (@struct || []).join("\n"), (scrapts || []).join(",\n\n"))
         out << "const int #{@count_name}=#{@scripts.count};\n" if @include_count
+        out << all_hashes_string_macro
         out << count_macro
         out << iter_macro
       end
