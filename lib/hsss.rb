@@ -104,6 +104,12 @@ module Hsss
     end
       
     def check_script(path)
+      luac_exists_ret = system "command -v luac &>/dev/null"
+      unless luac_exists_ret
+        @failed = true
+        STDERR.puts "luac is missing, cannot check script #{path}"
+        return false
+      end
       ret = system "luac -p #{path}"
       @failed = true unless ret
       ret
